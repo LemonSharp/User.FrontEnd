@@ -59,12 +59,6 @@ export default {
 
   methods: {
     onClickLogin() {
-      //   axios.defaults.withCredentials = true;
-      //   let d1 = axios.request({
-      //     method: "get",
-      //     url: "http://www.baidu.com",
-      //   });
-      //   console.log(d1);
       this.$router.push("/welcome");
     },
   },
