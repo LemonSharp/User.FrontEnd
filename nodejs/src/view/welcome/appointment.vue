@@ -8,17 +8,21 @@
       readonly
       label="区域"
       placeholder="点击选择接种点"
-      @click="show = true"
+      @click="onSiteClick"
     />
     <van-popup v-model="show" round position="bottom">
       <van-cascader
         v-model="cascaderValue"
         title="Select Area"
-        :options="options"
+        :options="vaccOptions"
         @close="show = false"
         @finish="onFinish"
       />
     </van-popup>
+
+    <van-dropdown-menu @click="onSiteClick">
+      <van-dropdown-item v-model="value1" :options="option1" />
+    </van-dropdown-menu>
 
     <div>
       <van-cell
@@ -37,6 +41,7 @@
 </template>
 
 <script>
+import axios from "axios";
 import Vue from "vue";
 import {
   List,
@@ -51,6 +56,8 @@ import {
   Cascader,
   DatetimePicker,
   Calendar,
+  DropdownMenu, 
+  DropdownItem
 } from "vant";
 
 Vue.use(NavBar);
@@ -65,6 +72,8 @@ Vue.use(List);
 Vue.use(Cascader);
 Vue.use(DatetimePicker);
 Vue.use(Calendar);
+Vue.use(DropdownMenu);
+Vue.use(DropdownItem);
 
 function AddDayToDate(Time, days) {
   var a = new Date(Time);
@@ -80,16 +89,11 @@ export default {
       show: false,
       fieldValue: "",
       cascaderValue: "",
-      options: [
+      vaccOptions: [
         {
           text: "浦东新区",
           value: "330000",
-          children: [{ text: "A社区医院", value: "330100" }],
-        },
-        {
-          text: "徐汇区",
-          value: "320000",
-          children: [{ text: "B社区医院", value: "320100" }],
+          children: [],
         },
       ],
       minDate: new Date(),
@@ -97,6 +101,9 @@ export default {
       currentDate: new Date(),
       date: "",
       showCalendar: false,
+      value1: 0,
+      option1: [
+      ],
     };
   },
 
@@ -118,6 +125,29 @@ export default {
       this.showCalendar = false;
       this.date = this.formatDate(date);
     },
+    onPageLoad() {
+      
+    },
+    onSiteClick() {
+      this.show = true;
+    },
+  },
+
+  mounted: function(){
+    var _this = this;
+    _this.$axios.get("/api/VaccinationSite/GetVaccination")
+        .then(function (response) {
+          var _this = this
+          console.log(response);
+          var arrayObj = new Array();
+          for (let index = 0; index < response.data.length; index++) {
+            const element = response.data[index];
+            console.log(element.siteName)
+            arrayObj.push({ text: element.siteName, value: element.siteId });
+          }
+          console.log(arrayObj);
+          _this.option1 = arrayObj;
+        });
   },
 };
 </script>
